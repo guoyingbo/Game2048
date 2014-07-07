@@ -4,7 +4,7 @@
 USING_NS_CC;
 
 #define TAG_SCORE 200
-#define TAG_SCORE 201
+#define TAG_BEST 201
 
 int getRand(int a, int b)
 {
@@ -15,12 +15,6 @@ int getRand(int a, int b)
 
 
 //实现部分
-typedef struct
-{
-	float x;
-	float y;
-
-} Vector2f;
 
 
 LayerBack::LayerBack()
@@ -29,11 +23,13 @@ LayerBack::LayerBack()
 		max[i] = 0;
 
 	m_score = 0;
+	m_best = CCUserDefault::sharedUserDefault()->getIntegerForKey("BestScore",0);
 }
 
 
 LayerBack::~LayerBack()
 {
+	CCUserDefault::sharedUserDefault()->setIntegerForKey("BestScore", m_best);
 }
 
 LayerBack* LayerBack::create()
@@ -122,8 +118,8 @@ bool LayerBack::init()
 		this->addChild(pL2048, 3);
 
 
-		int bestWidth = cellWidth*1.2;
-		int bestHeight = cellWidth*0.8;
+		int bestWidth = cellWidth*1.5;
+		int bestHeight = cellWidth;
 		ColorRect *best = ColorRect::create(ccc4(187, 173, 160, 255), bestWidth, bestHeight);
 		best->setPosition(origin.x+visibleSize.width - 16 - bestWidth,origin.y+visibleSize.height-16 - bestHeight);
 		this->addChild(best);
@@ -133,7 +129,7 @@ bool LayerBack::init()
 		pLBest->setPosition(ccp(best->getPositionX() + bestWidth / 2, best->getPositionY() + bestHeight *0.8));
 		this->addChild(pLBest,3);
 
-		CCLayerColor *score = CCLayerColor::create(ccc4(187, 173, 160, 255), bestWidth, bestHeight);
+		ColorRect *score = ColorRect::create(ccc4(187, 173, 160, 255), bestWidth, bestHeight);
 		score->setPosition(origin.x + visibleSize.width - 16-8 - bestWidth*2, origin.y + visibleSize.height - 16 - bestHeight);
 		this->addChild(score);
 	
@@ -144,6 +140,13 @@ bool LayerBack::init()
 		CCLabelTTF* pLScoreV = CCLabelTTF::create("0", "Arial Bold", cellWidth / 3);
 		pLScoreV->setPosition(ccp(score->getPositionX() + bestWidth / 2, score->getPositionY() + bestHeight *0.4));
 		this->addChild(pLScoreV, 3,TAG_SCORE);
+
+		CCString sbest;
+		sbest.initWithFormat("%d",m_best);
+
+		CCLabelTTF* pLBestV = CCLabelTTF::create(sbest.getCString(), "Arial Bold", cellWidth / 3);
+		pLBestV->setPosition(ccp(best->getPositionX() + bestWidth / 2, best->getPositionY() + bestHeight *0.4));
+		this->addChild(pLBestV, 3,TAG_BEST);
 
 		int temp = (visibleSize.height - 16  - cellWidth - boardWidth)/2;
 
@@ -203,324 +206,189 @@ int ab12[6] = { 1, 1, 1, 1, 1, 2 };
 void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEvent)
 {
 
-	const float timem = 0.1f;
-	const float times1 = 0.1f;
-	const float times2 = 0.2f;
-
 	CCTouch* touch = (CCTouch*)(pTouches->anyObject());
 	CCPoint posEnd = touch->getLocation();
-
 	CCPoint direct = posEnd - posBegin;
 
 	if (direct.getLength() < 0.1)
 		return;
 
+	int merge[16] = {0};
 	int score = m_score;
 	float angle = direct.getAngle()* 180/3.1415926;
-
+	
 	bool cMove = false;
-	int vector;
-	if (angle <= 45 && angle > -45)  //right
+	const static float moveDuration = 0.1f;
+	const static float scaleDurationA = 0.1f;
+	const static float scaleDurationB = 0.1f;
+	const static float scaleZoom = 1.3f;
+
+	int direction = 0;
+
+	if (angle <= 45 && angle > -45) direction = 1;	 //right
+	if (angle > 45 && angle <= 135)	direction = 3;	 //up
+	if (angle > 135 || angle <= -135) direction = 2; //left
+	if (angle <= -45 && angle > -135) direction = 4; //down
+
+	for (int i = 0; i < 4; i++)
 	{
-		for (int j = 2; j >= 0; j--)
-		for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
 		{
-			int title1 = max[i * 4 + j];
+			int x1,y1,x2,y2,x3,y3;
+			int title1,title2;
+			int index;
+			switch (direction)
+			{
+			case 1:				//right
+				{
+					x1 = i;y1 = 3 - j;
+					if (y1 == 3) continue;
+					title1 = max[x1 * 4 + y1];
+					index = 3;
+
+					for (int k = y1 + 1; k < 4; k++)
+					{
+						if (max[x1 * 4 + k] > 0)
+						{
+							index = k;
+							break;
+						}
+					}
+					x2 = x1; y2 = index;
+					x3 = x1; y3 = index - 1;
+				}
+				break;
+			case 3:				//up
+				{
+					x1 = 3 - i; y1 = j;
+					if (x1 == 3) continue;
+					title1 = max[x1 * 4 + y1];
+
+					index = 3;
+					for (int k = x1 + 1; k < 4; k++)
+					{
+						if (max[k * 4 + y1] > 0)
+						{
+							index = k;
+							break;
+						}
+					}
+					x2 = index; y2 = y1;
+					x3 = index - 1; y3 = y1;
+				}
+				break;
+			case 2:				//left
+				{
+					x1 = i; y1 = j;
+					if (y1 == 0) continue;
+					title1 = max[x1 * 4 + y1];
+
+					index = 0;
+					for (int k = y1 - 1; k > 0; k--)
+					{
+						if (max[x1 * 4 + k] > 0)
+						{
+							index = k;
+							break;
+						}
+					}
+
+					x2 = x1; y2 = index;
+					x3 = x1; y3 = index+1;
+				}
+				break;
+			case 4:				//down
+				{
+					x1 = i; y1 = j;
+					if ( x1 == 0) continue;
+					title1 = max[x1 * 4 + y1];
+
+					index = 0;
+					for (int k = x1 - 1; k > 0; k--)
+					{
+						if (max[k * 4 + y1] > 0)
+						{
+							index = k;
+							break;
+						}
+					}
+					x2 = index; y2 = y1;
+					x3 = index + 1; y3 = y1;
+				}
+				break;
+			}
+
+			if (title1 == 0) continue;
 			
-			if (title1>0)
+			title2 = max[x2 * 4 + y2];
+			if (title1 == title2)
 			{
-				int index = 3;
-				for (int k = j + 1; k < 4; k++)
-				{
-					if (max[i * 4 + k] > 0)
-					{
-						index = k;
-						break;
-					}
-						
-				}
+				CCNode *node1 = this->getChildByTag(x1 * 4 + y1);
+				CCNode *node2 = this->getChildByTag(x2 * 4 + y2);
 
-				int title2 = max[i * 4 + index];
-				if (title1 == title2)
+				if (merge[x2 * 4 + y2] == 1)
 				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-					CCNode *node2 = this->getChildByTag(i * 4 + index);
+					node1->runAction(CCMoveTo::create(moveDuration,position[x3][y3]));
+					node1->setTag(x3 * 4 + y3);
+					max[x1 * 4 + y1] = 0;
+					max[x3 * 4 + y3] = title1;
+				} 
+				else
+				{
+					node1->setTag(x2 * 4 + y2);
+					((NumberCell*)node1)->SetTitle(title2+1);
 
 					this->removeChild(node2);
-					
+					CCMoveTo *actionM = CCMoveTo::create(moveDuration,position[x2][y2]);
+					CCScaleTo *actionA = CCScaleTo::create(scaleDurationA,scaleZoom);
+					CCScaleTo *actionB = CCScaleTo::create(scaleDurationB,1);
+					node1->runAction(CCSequence::create(actionM,actionA,actionB,NULL));
 
-					node1->setTag(i*4+index);
-					((NumberCell*)node1)->SetTitle(title2+1);
-					
-					CCActionInterval*  actionMove = CCMoveTo::create(timem,position[i][index]);
-					CCActionInterval*  actionTo = CCScaleTo::create(times1, 1.3);
-					CCActionInterval*  actionBy = CCScaleTo::create(times2, 1);
-
-					node1->runAction(CCSequence::create(actionMove,actionTo, actionBy, NULL));
-
-					max[i * 4 + j] = 0;
-					max[i * 4 + index] = title2 +1;
-					cMove = true;
-					
-					score += pow((float)2, title2 + 1);
+					max[x1 * 4 + y1] = 0;
+					max[x2 * 4 + y2] = title2 + 1;
+					merge[x2 * 4 + y2] = 1;
+					score += (1 << (title2 + 1));
 				}
-				else if(title2 > 0)
-				{
-					if (index - 1 != j)
-					{
-						CCNode *node1 = this->getChildByTag(i * 4 + j);
-					//	node1->setPosition(position[i][index - 1]);
-						node1->runAction(CCMoveTo::create(timem,position[i][index-1]));
-						node1->setTag(i * 4 + index - 1);
-						max[i * 4 + j] = 0;
-						max[i * 4 + index - 1] = title1;
-						cMove = true;
-					}
 
-				}
-				else
-				if (title2 == 0)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-				//	node1->setPosition(position[i][index]);
-					node1->runAction(CCMoveTo::create(timem,position[i][index]));
-					node1->setTag(i * 4 + index);
-					max[i * 4 + j] = 0;
-					max[i * 4 + index] = title1;
-					cMove = true;
-				}
-				
+				cMove = true;
 			}
+			else if (title2 > 0)
+			{
+				if (x3 != x1 || y3 != y1)
+				{
+					CCNode *node1 = this->getChildByTag(x1 * 4 + y1);
+					node1->runAction(CCMoveTo::create(moveDuration,position[x3][y3]));
+					node1->setTag(x3 * 4 + y3);
+					max[x1 * 4 + y1] = 0;
+					max[x3 * 4 + y3] = title1;
+					cMove = true;
+				}
+			}
+			else if (title2 == 0)
+			{
+				CCNode *node = this->getChildByTag(x1 * 4 + y1);
+				node->runAction(CCMoveTo::create(moveDuration,position[x2][y2]));
+				node->setTag(x2 * 4 + y2);
+				max[x1 * 4 + y1] = 0;
+				max[x2 * 4 + y2] = title1;
+				cMove = true;
+			}
+			
 		}
 
+
 	}
-	if (angle > 45 && angle <= 135)  //up
+
+	int count = 0;
+	for (int i = 0; i < 16; i++)
 	{
-		for (int i = 2; i >= 0; i--)
-		for (int j = 0; j < 4; j++)
+		if (max[i] == 0)
 		{
-			int title1 = max[i * 4 + j];
-
-			if (title1>0)
-			{
-				int index = 3;
-				for (int k = i + 1; k < 4; k++)
-				{
-					if (max[k * 4 + j] > 0)
-					{
-						index = k;
-						break;
-					}
-						
-				}
-
-				int title2 = max[index * 4 + j];
-				if (title1 == title2)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-					CCNode *node2 = this->getChildByTag(index * 4 + j);
-
-					this->removeChild(node2);
-					
-
-					node1->setTag(index*4+j);
-					((NumberCell*)node1)->SetTitle(title2+1);
-
-					CCActionInterval*  actionMove = CCMoveTo::create(timem,position[index][j]);
-					CCActionInterval*  actionTo = CCScaleTo::create(times1, 1.3);
-					CCActionInterval*  actionBy = CCScaleTo::create(times2, 1);
-
-					node1->runAction(CCSequence::create(actionMove,actionTo, actionBy, NULL));
-
-					max[i * 4 + j] = 0;
-					max[index * 4 + j] = title2 +1;
-					cMove = true;
-					score += pow((float)2, title2 + 1);
-				}
-				else if (title2 > 0)
-				{
-					if (index - 1 != i)
-					{
-						CCNode *node1 = this->getChildByTag(i * 4 + j);
-					//	node1->setPosition(position[index - 1][j]);
-						node1->runAction(CCMoveTo::create(timem,position[index-1][j]));
-						node1->setTag((index - 1) * 4 + j);
-						max[i * 4 + j] = 0;
-						max[(index - 1) * 4 + j] = title1;
-						cMove = true;
-
-					}
-
-				}
-				else
-				if (title2 == 0)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-				//	node1->setPosition(position[index][j]);
-					node1->runAction(CCMoveTo::create(timem,position[index][j]));
-					node1->setTag(index * 4 + j);
-					max[i * 4 + j] = 0;
-					max[index * 4 + j] = title1;
-					cMove = true;
-				}
-
-			}
+			count++;
 		}
 	}
-	if (angle > 135 || angle <= -135) //left
-	{
-		for (int j = 1; j < 4; j++)
-		for (int i = 0; i < 4; i++)
-		{
-			int title1 = max[i * 4 + j];
-
-			if (title1>0)
-			{
-				int index = 0;
-				for (int k = j -1; k > 0; k--)
-				{
-					if (max[i * 4 + k] > 0)
-					{
-						index = k;
-						break;
-					}
-				}
-
-				int title2 = max[i * 4 + index];
-				if (title1 == title2)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-					CCNode *node2 = this->getChildByTag(i * 4 + index);
-
-					this->removeChild(node2);
-					
-
-					node1->setTag(i*4+index);
-					((NumberCell*)node1)->SetTitle(title2+1);
-
-					CCActionInterval*  actionMove = CCMoveTo::create(timem,position[i][index]);
-					CCActionInterval*  actionTo = CCScaleTo::create(times1, 1.3);
-					CCActionInterval*  actionBy = CCScaleTo::create(times2, 1);
-
-					node1->runAction(CCSequence::create(actionMove,actionTo, actionBy, NULL));
-
-					max[i * 4 + j] = 0;
-					max[i * 4 + index] = title2+1;
-					cMove = true;;
-					score += pow((float)2, title2 + 1);
-				}
-				else if (title2 > 0)
-				{
-					if (index + 1 != j)
-					{
-						CCNode *node1 = this->getChildByTag(i * 4 + j);
-					//	node1->setPosition(position[i][index + 1]);
-						node1->runAction(CCMoveTo::create(timem,position[i][index+1]));
-						node1->setTag(i * 4 + index + 1);
-						max[i * 4 + j] = 0;
-						max[i * 4 + index + 1] = title1;
-						cMove = true;
-					}
-
-				}
-				else
-				if (title2 == 0)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-				//	node1->setPosition(position[i][index]);
-					node1->runAction(CCMoveTo::create(timem,position[i][index]));
-					node1->setTag(i * 4 + index);
-					max[i * 4 + j] = 0;
-					max[i * 4 + index] = title1;
-					cMove = true;
-				}
-
-			}
-		}
-	}
-	if (angle <= -45 && angle > -135) //down;
-	{
-		for (int i = 1; i < 4; i++)
-		for (int j = 0; j < 4; j++)
-		{
-			int title1 = max[i * 4 + j];
-
-			if (title1>0)
-			{
-				int index = 0;
-				for (int k = i - 1; k > 0; k--)
-				{
-					if (max[k * 4 + j] > 0)
-					{
-						index = k;
-						break;
-					}
-						
-				}
-
-				int title2 = max[index * 4 + j];
-				if (title1 == title2)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-					CCNode *node2 = this->getChildByTag(index * 4 + j);
-
-					this->removeChild(node2);
-					
-
-					node1->setTag(index*4+j);
-					((NumberCell*)node1)->SetTitle(title2+1);
-
-					CCActionInterval*  actionMove = CCMoveTo::create(timem,position[index][j]);
-					CCActionInterval*  actionTo = CCScaleTo::create(times1, 1.3);
-					CCActionInterval*  actionBy = CCScaleTo::create(times2, 1);
-
-					node1->runAction(CCSequence::create(actionMove,actionTo, actionBy, NULL));
-
-					max[i * 4 + j] = 0;
-					max[index * 4 + j] = title2 +1;
-					cMove = true;
-					score += pow((float)2, title2 + 1);
-
-				}
-				else if (title2 > 0)
-				{
-					if (index + 1 != i)
-					{
-						CCNode *node1 = this->getChildByTag(i * 4 + j);
-					//	node1->setPosition(position[index + 1][j]);
-						node1->runAction(CCMoveTo::create(timem,position[index+1][j]));
-						node1->setTag((index + 1) * 4 + j);
-						max[i * 4 + j] = 0;
-						max[(index + 1) * 4 + j] = title1;
-						cMove = true;
-					}
-
-				}
-				else
-				if (title2 == 0)
-				{
-					CCNode *node1 = this->getChildByTag(i * 4 + j);
-				//	node1->setPosition(position[index][j]);
-					node1->runAction(CCMoveTo::create(timem,position[index][j]));
-					node1->setTag(index * 4 + j);
-					max[i * 4 + j] = 0;
-					max[index * 4 + j] = title1;
-					cMove = true;
-				}
-
-			}
-		}
-	}
-
 	if (cMove)
 	{
-		int count = 0;
-		for (int i = 0; i < 16; i++)
-		{
-			if (max[i] == 0)
-				count++;
-		}
-
 		if (count == 0)
 		{
 			//Game over
@@ -537,9 +405,14 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
 
 		max[index] = ab12[getRand(0, 5)];
 
-		NumberCell *cell1 = NumberCell::create(CCSize(cellWidth, cellWidth), max[index]);
-		cell1->setPosition(position[index / 4][index % 4]);
-		this->addChild(cell1, 4, index);
+		NumberCell *cell = NumberCell::create(CCSize(cellWidth, cellWidth), max[index]);
+		cell->setPosition(position[index / 4][index % 4]);
+		this->addChild(cell, 4, index);
+
+		CCScaleTo *actionA = CCScaleTo::create(0.05,0.5);
+		CCScaleTo *actionB = CCScaleTo::create(0.3,1);
+		cell->runAction(CCSequence::create(actionA,actionB,NULL));
+
 	}
 
 	if (m_score != score)
@@ -549,6 +422,16 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
 		cs.initWithFormat("%d", score);
 		pLScore->setString(cs.getCString());
 		m_score = score;
+
+		if (m_best < m_score)
+		{
+			m_best = m_score;
+			CCLabelTTF *pLBest = (CCLabelTTF*)this->getChildByTag(TAG_BEST);
+			CCString cs;
+			cs.initWithFormat("%d", m_best);
+			pLBest->setString(cs.getCString());
+		}
+
 	}
 
 }
