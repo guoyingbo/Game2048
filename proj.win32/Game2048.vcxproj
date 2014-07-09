@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\LayerBack.cpp" />
+    <ClCompile Include="..\Classes\ModelDialog.cpp" />
     <ClCompile Include="..\Classes\NumberCell.cpp" />
     <ClCompile Include="..\Classes\roundrect.cpp" />
     <ClCompile Include="..\Classes\SenceOne.cpp" />
@@ -134,9 +135,11 @@
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AppMacros.h" />
     <ClInclude Include="..\Classes\LayerBack.h" />
+    <ClInclude Include="..\Classes\ModelDialog.h" />
     <ClInclude Include="..\Classes\NumberCell.h" />
     <ClInclude Include="..\Classes\SenceOne.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\cocos2dx\proj.win32\cocos2d.vcxproj">
@@ -147,6 +150,12 @@
       <Project>{f8edd7fa-9a51-4e80-baeb-860825d2eac6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game2048.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

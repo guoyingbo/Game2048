@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{db1a1d85-082d-4ee2-ab75-30a85962b7f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp">
@@ -27,6 +30,9 @@
       <Filter>Classes</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\NumberCell.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ModelDialog.cpp">
       <Filter>Classes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -49,5 +55,21 @@
     <ClInclude Include="..\Classes\NumberCell.h">
       <Filter>Classes</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ModelDialog.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game2048.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon1.ico">
+      <Filter>resource</Filter>
+    </None>
   </ItemGroup>
 </Project>

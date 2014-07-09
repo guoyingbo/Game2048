@@ -120,3 +120,37 @@ ColorRect* ColorRect::create( const cocos2d::ccColor4B& color, GLfloat width, GL
 		return NULL;
 	}
 }
+
+TitleRect::TitleRect( const char* text ) :m_text(text)
+{
+
+}
+
+TitleRect* TitleRect::create( const cocos2d::ccColor4B& color, GLfloat width, GLfloat height,const char* text )
+{
+	TitleRect* pRet = new TitleRect(text);
+	if (pRet && pRet->initWithColor(color,width,height))
+	{
+		pRet->autorelease();
+		return pRet;
+	}
+	else
+	{
+		delete pRet;
+		pRet = NULL;
+		return NULL;
+	}
+}
+
+bool TitleRect::initWithColor( const ccColor4B& color, GLfloat width, GLfloat height )
+{
+	CCLayerColor::initWithColor(color,width,height);
+
+	CCLabelTTF *pLable = CCLabelTTF::create(m_text.getCString(),"Arial Bold",height/2);
+
+	pLable->setPosition(ccp(width/2, height/2));
+	
+	this->addChild(pLable,1,1);
+
+	return true;
+}

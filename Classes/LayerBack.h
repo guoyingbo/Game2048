@@ -13,7 +13,10 @@ public:
 	virtual void draw();
 
 	// a selector callback
-	virtual void menuCloseCallback(cocos2d::CCObject* pSender);
+	void menuCloseCallback(cocos2d::CCObject* pSender);
+	void menuRestartCallback(cocos2d::CCObject* pSender);
+
+	void callbackRestart();
 
 	virtual void ccTouchMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent);
 

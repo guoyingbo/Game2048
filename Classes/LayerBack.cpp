@@ -1,6 +1,8 @@
 #include "LayerBack.h"
 #include "AppMacros.h"
 #include "NumberCell.h"
+#include "ModelDialog.h"
+
 USING_NS_CC;
 
 #define TAG_SCORE 200
@@ -67,6 +69,7 @@ void LayerBack::draw()
 	
 }
 
+#define BANK 16
 bool LayerBack::init()
 {
 
@@ -76,36 +79,38 @@ bool LayerBack::init()
 		CC_BREAK_IF(!CCLayerColor::initWithColor(ccc4(250, 248, 239,255)));
 
 		// Create a "close" menu item with close icon, it's an auto release object.
-		CCMenuItemImage *pCloseItem = CCMenuItemImage::create(
-			"CloseNormal.png",
-			"CloseSelected.png",
-			this,
-			menu_selector(LayerBack::menuCloseCallback));
-		CC_BREAK_IF(!pCloseItem);
+// 		CCMenuItemImage *pCloseItem = CCMenuItemImage::create(
+// 			"CloseNormal.png",
+// 			"CloseSelected.png",
+// 			this,
+// 			menu_selector(LayerBack::menuCloseCallback));
+// 		CC_BREAK_IF(!pCloseItem);
 
 		// Place the menu item bottom-right conner.
 		CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
 		CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
-		pCloseItem->setPosition(ccp(origin.x + visibleSize.width - pCloseItem->getContentSize().width / 2,
-			origin.y + pCloseItem->getContentSize().height / 2));
+// 		pCloseItem->setPosition(ccp(origin.x + visibleSize.width - pCloseItem->getContentSize().width / 2,
+// 			origin.y + pCloseItem->getContentSize().height / 2));
+// 
+// 		// Create a menu with the "close" menu item, it's an auto release object.
+// 		CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
+// 		pMenu->setPosition(CCPointZero);
+// 		CC_BREAK_IF(!pMenu);
+// 
+// 		// Add the menu to HelloWorld layer as a child layer.
+// 		this->addChild(pMenu, 5);
 
-		// Create a menu with the "close" menu item, it's an auto release object.
-		CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-		pMenu->setPosition(CCPointZero);
-		CC_BREAK_IF(!pMenu);
-
-		// Add the menu to HelloWorld layer as a child layer.
-		this->addChild(pMenu, 5);
 
 
-
-		int boardWidth = visibleSize.width - 32;
+		float boardWidth = visibleSize.width - BANK*2;
+		float panY = (visibleSize.height - boardWidth)/2;
+		
 		int space = 8;
 		cellWidth = (boardWidth - space * 5) / 4.0;
 	
 		ColorRect *title = ColorRect::create(ccc4(236, 196, 0, 255), cellWidth, cellWidth);
-		title->setPosition(origin.x + 16, origin.y + visibleSize.height - cellWidth - 16);
+		title->setPosition(origin.x + BANK, origin.y + visibleSize.height - panY/2 - cellWidth/2);
 		this->addChild(title, 2);	
 
 
@@ -121,7 +126,7 @@ bool LayerBack::init()
 		int bestWidth = cellWidth*1.5;
 		int bestHeight = cellWidth;
 		ColorRect *best = ColorRect::create(ccc4(187, 173, 160, 255), bestWidth, bestHeight);
-		best->setPosition(origin.x+visibleSize.width - 16 - bestWidth,origin.y+visibleSize.height-16 - bestHeight);
+		best->setPosition(origin.x+visibleSize.width - BANK - bestWidth,origin.y + visibleSize.height - panY/2 - cellWidth/2);
 		this->addChild(best);
 		
 
@@ -130,7 +135,7 @@ bool LayerBack::init()
 		this->addChild(pLBest,3);
 
 		ColorRect *score = ColorRect::create(ccc4(187, 173, 160, 255), bestWidth, bestHeight);
-		score->setPosition(origin.x + visibleSize.width - 16-8 - bestWidth*2, origin.y + visibleSize.height - 16 - bestHeight);
+		score->setPosition(origin.x + visibleSize.width - BANK-8 - bestWidth*2, origin.y + visibleSize.height - panY/2 - cellWidth/2);
 		this->addChild(score);
 	
 		CCLabelTTF* pLScore = CCLabelTTF::create("SCORE", "Arial Bold", cellWidth / 6);
@@ -148,26 +153,51 @@ bool LayerBack::init()
 		pLBestV->setPosition(ccp(best->getPositionX() + bestWidth / 2, best->getPositionY() + bestHeight *0.4));
 		this->addChild(pLBestV, 3,TAG_BEST);
 
-		int temp = (visibleSize.height - 16  - cellWidth - boardWidth)/2;
+
+		
 
 		CCLayerColor *pan = CCLayerColor::create(ccc4(187, 173, 160, 255), boardWidth, boardWidth);
-		pan->setPosition(origin.x+16,origin.y+temp);
+		pan->setPosition(origin.x+BANK,origin.y+panY);
 
 		this->addChild(pan, 2);
-
-
 		
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 4; j++)
 			{
 				CCLayerColor *fang = CCLayerColor::create(ccc4(204, 192, 180, 255), cellWidth, cellWidth);
-				position[i][j] = ccp(origin.x + 16 + j*(cellWidth + space) + space, origin.y + temp + i*(cellWidth + space) + space);
+				position[i][j] = ccp(origin.x + BANK + j*(cellWidth + space) + space, origin.y + panY + i*(cellWidth + space) + space);
 				fang->setPosition(position[i][j]);
 				this->addChild(fang, 3);
 			}
 
 		}
+
+		float menuItemWidth = 0.9*boardWidth/2;
+		float menuItemHeight = menuItemWidth*0.35;
+
+		TitleRect *titleRestart = TitleRect::create(ccc4(187, 173, 160, 255),menuItemWidth,menuItemHeight,"Restart");
+		CCMenuItemLabel *menuItemRestart = CCMenuItemLabel::create(titleRestart,this,menu_selector(LayerBack::menuRestartCallback));
+
+		menuItemRestart->setPosition(origin.x+visibleSize.width-menuItemWidth/2-BANK,origin.y + panY/2);
+
+		CCMenu *menuRestart = CCMenu::create(menuItemRestart,NULL);
+		menuRestart->setPosition(CCPointZero);
+		this->addChild(menuRestart,5);
+
+
+		TitleRect *titleOptions = TitleRect::create(ccc4(187, 173, 160, 255),menuItemWidth,menuItemHeight,"Options");
+		CCMenuItemLabel *menuItemOptions = CCMenuItemLabel::create(titleOptions,this,menu_selector(LayerBack::menuRestartCallback));
+
+		menuItemOptions->setPosition(origin.x+menuItemWidth/2+BANK,origin.y + (panY/2));
+
+		CCMenu *menuOptions = CCMenu::create(menuItemOptions,NULL);
+		menuOptions->setPosition(CCPointZero);
+		this->addChild(menuOptions,5);
+
+
+
+
 
 		this->setTouchEnabled(true);
 
@@ -409,8 +439,8 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
 		cell->setPosition(position[index / 4][index % 4]);
 		this->addChild(cell, 4, index);
 
-		CCScaleTo *actionA = CCScaleTo::create(0.05,0.5);
-		CCScaleTo *actionB = CCScaleTo::create(0.3,1);
+		CCScaleTo *actionA = CCScaleTo::create(0.05f,0.5f);
+		CCScaleTo *actionB = CCScaleTo::create(0.3f,1.f);
 		cell->runAction(CCSequence::create(actionA,actionB,NULL));
 
 	}
@@ -469,7 +499,7 @@ void LayerBack::initBoard()
 
 	int in1 = getRand(0, 15);
 
-	max[in1] = ab12[getRand(0, 5)];
+	max[in1] = 1;
 
 	NumberCell *cell1 = new NumberCell(CCSize(cellWidth, cellWidth), max[in1]);
 	cell1->init();
@@ -490,4 +520,22 @@ void LayerBack::initBoard()
 	cell2->init();
 	cell2->setPosition(position[in2 / 4][in2 % 4]);
 	this->addChild(cell2, 4, in2);
+	m_score = 0;
+	CCLabelTTF *pLScore = (CCLabelTTF*)this->getChildByTag(TAG_SCORE);
+	pLScore->setString("0");
+
+	cell1->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.05,0.5),CCScaleTo::create(0.3,1)));
+	cell2->runAction(CCSequence::createWithTwoActions(CCScaleTo::create(0.05,0.5),CCScaleTo::create(0.3,1)));
+}
+
+void LayerBack::menuRestartCallback( cocos2d::CCObject* pSender )
+{
+	ModelDialog* dlg = ModelDialog::create("Are you sure to restart?",this,callfunc_selector(LayerBack::callbackRestart),0);
+
+	this->addChild(dlg,20);
+}
+
+void LayerBack::callbackRestart()
+{
+	initBoard();
 }
