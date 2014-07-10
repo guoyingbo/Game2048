@@ -71,7 +71,7 @@ bool ModelDialog::init( const char* title,int type )
 		menu->alignItemsHorizontallyWithPadding(rectX*0.4);
 
 
-		CCLabelTTF *pTitle = CCLabelTTF::create(title,"Arial Bold",rectY*0.2,CCSize(rectX,rectY*0.7),CCTextAlignment::kCCTextAlignmentCenter);
+		CCLabelTTF *pTitle = CCLabelTTF::create(title,"Arial Bold",rectY*0.2,CCSize(rectX*0.8,rectY*0.7),CCTextAlignment::kCCTextAlignmentCenter);
 
 		pTitle->setPosition(ccp(origin.x+(visibleSize.width)/2,origin.y+(visibleSize.height)/2));
 	    //pTitle->setColor(ccc3(119,110,101));
@@ -90,7 +90,7 @@ void ModelDialog::registerWithTouchDispatcher()
 	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this,kCCMenuHandlerPriority*2,true);
 }
 
-bool ModelDialog::ccTouchBegan( CCTouch */*pTouch*/, CCEvent */*pEvent*/ )
+bool ModelDialog::ccTouchBegan( CCTouch* /*pTouch*/, CCEvent* /*pEvent*/ )
 {
 	return true;
 }

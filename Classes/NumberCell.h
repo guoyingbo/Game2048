@@ -16,6 +16,9 @@ public:
 	TitleRect(const char* text);
 	virtual bool initWithColor(const cocos2d::ccColor4B& color, GLfloat width, GLfloat height);
 	static TitleRect* create(const cocos2d::ccColor4B& color, GLfloat width, GLfloat height,const char* text);
+
+	void SetTitle(const char* title);
+
 private:
 	cocos2d::CCString m_text;
 };

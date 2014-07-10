@@ -2,6 +2,9 @@
 #include "AppMacros.h"
 #include "NumberCell.h"
 #include "ModelDialog.h"
+#include "LayerOptions.h"
+#include "Config.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -19,19 +22,16 @@ int getRand(int a, int b)
 //实现部分
 
 
-LayerBack::LayerBack()
+LayerBack::LayerBack(): m_best(Config::shareConfig()->bestScore),
+	m_maxTitle(Config::shareConfig()->maxTitle)
 {
 	for (int i = 0; i < 16; i++)
 		max[i] = 0;
-
-	m_score = 0;
-	m_best = CCUserDefault::sharedUserDefault()->getIntegerForKey("BestScore",0);
 }
 
 
 LayerBack::~LayerBack()
-{
-	CCUserDefault::sharedUserDefault()->setIntegerForKey("BestScore", m_best);
+{	
 }
 
 LayerBack* LayerBack::create()
@@ -187,7 +187,7 @@ bool LayerBack::init()
 
 
 		TitleRect *titleOptions = TitleRect::create(ccc4(187, 173, 160, 255),menuItemWidth,menuItemHeight,"Options");
-		CCMenuItemLabel *menuItemOptions = CCMenuItemLabel::create(titleOptions,this,menu_selector(LayerBack::menuRestartCallback));
+		CCMenuItemLabel *menuItemOptions = CCMenuItemLabel::create(titleOptions,this,menu_selector(LayerBack::menuOptionsCallback));
 
 		menuItemOptions->setPosition(origin.x+menuItemWidth/2+BANK,origin.y + (panY/2));
 
@@ -200,6 +200,7 @@ bool LayerBack::init()
 
 
 		this->setTouchEnabled(true);
+		this->setKeypadEnabled(true);
 
 		initBoard();
 		bRet = true;
@@ -248,6 +249,7 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
 	float angle = direct.getAngle()* 180/3.1415926;
 	
 	bool cMove = false;
+	bool bMerge = false;
 	const static float moveDuration = 0.1f;
 	const static float scaleDurationA = 0.1f;
 	const static float scaleDurationB = 0.1f;
@@ -378,9 +380,16 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
 					max[x2 * 4 + y2] = title2 + 1;
 					merge[x2 * 4 + y2] = 1;
 					score += (1 << (title2 + 1));
+
+					if (title2+1 > m_maxTitle)
+					{
+						m_maxTitle = title2+1;
+					}
+
 				}
 
 				cMove = true;
+				bMerge = true;
 			}
 			else if (title2 > 0)
 			{
@@ -419,6 +428,11 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
 	}
 	if (cMove)
 	{
+		if (Config::shareConfig()->bSound)
+		{
+			CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect(bMerge?"merge.wav":"move.wav");
+		}
+		
 		if (count == 0)
 		{
 			//Game over
@@ -538,4 +552,32 @@ void LayerBack::menuRestartCallback( cocos2d::CCObject* pSender )
 void LayerBack::callbackRestart()
 {
 	initBoard();
+}
+
+#define TAG_CLOSE_DLG 102
+
+void LayerBack::keyBackClicked( void )
+{
+	if (this->getChildByTag(TAG_CLOSE_DLG))
+	{
+		return;
+	}
+	ModelDialog* dlg = ModelDialog::create("Are you sure to exit?",this,callfunc_selector(LayerBack::callbackExit),0);
+
+	this->addChild(dlg,20,TAG_CLOSE_DLG);
+}
+
+void LayerBack::callbackExit()
+{
+
+	CCDirector::sharedDirector()->end();
+
+
+}
+
+void LayerBack::menuOptionsCallback( cocos2d::CCObject* pSender )
+{
+	CCScene* scene = LayerOptions::scene();
+
+	CCDirector::sharedDirector()->pushScene(scene);
 }

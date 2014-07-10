@@ -154,3 +154,13 @@ bool TitleRect::initWithColor( const ccColor4B& color, GLfloat width, GLfloat he
 
 	return true;
 }
+
+void TitleRect::SetTitle( const char* title )
+{
+	CCLabelTTF* lable = (CCLabelTTF*)this->getChildByTag(1);
+
+	lable->setString(title);
+
+	m_text = title;
+
+}

@@ -15,8 +15,9 @@ public:
 	// a selector callback
 	void menuCloseCallback(cocos2d::CCObject* pSender);
 	void menuRestartCallback(cocos2d::CCObject* pSender);
-
+	void menuOptionsCallback(cocos2d::CCObject* pSender);
 	void callbackRestart();
+	void callbackExit();
 
 	virtual void ccTouchMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent);
 
@@ -26,6 +27,7 @@ public:
 	// implement the "static node()" method manually
 	static LayerBack* create();
 
+	virtual void keyBackClicked(void);
 
 	void updateBoard();
 	void initBoard();
@@ -38,6 +40,7 @@ private:
 	cocos2d::CCPoint posBegin;
 
 	int m_score;
-	int m_best;
+	int &m_best;
+	int &m_maxTitle;
 };
 
