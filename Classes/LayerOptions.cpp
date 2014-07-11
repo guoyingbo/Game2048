@@ -40,7 +40,7 @@ bool LayerOptions::init()
 		CC_BREAK_IF(!initWithColor(ccc4(250, 248, 239,255)));
 
 		CCLabelTTF* label = CCLabelTTF::create("OPTIONS","Arial Bold",32,
-			CCSize(visibleSize.width,visibleSize.height*0.7),CCTextAlignment::kCCTextAlignmentCenter);
+			CCSize(visibleSize.width,visibleSize.height*0.7),kCCTextAlignmentCenter);
 
 		CC_BREAK_IF(!label);
 

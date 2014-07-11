@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include <vector>
 #include <string>
 
-#include "HelloWorldScene.h"
 #include "AppMacros.h"
 #include "LayerBack.h"
 USING_NS_CC;

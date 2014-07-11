@@ -1,6 +1,4 @@
-
-#include "config.h"
-#include "cocos2d.h"
+#include "Config.h"
 
 USING_NS_CC;
 static Config s_config;

@@ -1,16 +1,21 @@
-EXECUTABLE = HelloCpp
+EXECUTABLE = Game2048
 
 INCLUDES = -I.. -I../Classes
 
 SOURCES = main.cpp \
         ../Classes/AppDelegate.cpp \
-        ../Classes/HelloWorldScene.cpp
+        ../Classes/LayerBack.cpp \
+        ../Classes/LayerOptions.cpp \
+        ../Classes/ModelDialog.cpp \
+        ../Classes/NumberCell.cpp \
+	../Classes/Config.cpp
 
 COCOS_ROOT = ../../../..
 include $(COCOS_ROOT)/cocos2dx/proj.linux/cocos2dx.mk
 
-SHAREDLIBS += -lcocos2d
-COCOS_LIBS = $(LIB_DIR)/libcocos2d.so
+SHAREDLIBS += -lcocos2d -lcocosdenshion 
+COCOS_LIBS = $(LIB_DIR)/libcocos2d.so $(LIB_DIR)/libcocosdenshion.so
+INCLUDES += -I$(COCOS_ROOT)/CocosDenshion/include
 
 $(TARGET): $(OBJECTS) $(STATICLIBS) $(COCOS_LIBS) $(CORE_MAKEFILE_LIST)
 	@mkdir -p $(@D)
