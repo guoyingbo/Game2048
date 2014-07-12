@@ -10,8 +10,6 @@ public:
 
     virtual bool init();
 
-    virtual void draw();
-
     // a selector callback
     void menuCloseCallback(cocos2d::CCObject* pSender);
     void menuRestartCallback(cocos2d::CCObject* pSender);
@@ -20,7 +18,6 @@ public:
     void callbackExit();
     void callbackGameover();
     void callbackWin();
-    virtual void ccTouchMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent);
 
     virtual void registerWithTouchDispatcher(void);
     virtual void ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEvent);

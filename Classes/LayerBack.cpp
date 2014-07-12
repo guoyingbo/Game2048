@@ -53,24 +53,6 @@ LayerBack* LayerBack::create()
     }
 }
 
-void LayerBack::draw()
-{
-    CCLayerColor::draw();
-    //CCSize size = this->getContentSize();
-    //CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-    //
-    //CCPoint orgin = ccp(30,visibleSize.height);
-    //CCPoint dest = ccp(80, visibleSize.height - 50);
-
-
-
-    //
-    //ccDrawSolidRect(orgin,dest,ccc4f(0.92549,0.76863,0,1));
-
-    //ccDrawColor4B(229, 190, 0, 255);
-    //ccDrawRect(orgin, dest);
-
-}
 
 #define BANK 16
 bool LayerBack::init()
@@ -191,13 +173,6 @@ void LayerBack::menuCloseCallback(CCObject* pSender)
 #endif
 }
 
-
-void LayerBack::ccTouchMoved(cocos2d::CCSet *pTouches, cocos2d::CCEvent *pEvent)
-{
-    CCTouch* touch = (CCTouch*)(pTouches->anyObject());
-    CCPoint location = touch->getLocation();
-
-}
 
 
 void LayerBack::registerWithTouchDispatcher()
