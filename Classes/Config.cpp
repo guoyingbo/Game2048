@@ -1,25 +1,28 @@
 #include "Config.h"
 
 USING_NS_CC;
-static Config s_config;
+static Global s_config;
 
-Config::Config()
+Global::Global()
 {
-	bestScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("BestScore",0);
-	maxTitle = CCUserDefault::sharedUserDefault()->getIntegerForKey("MaxTitle",0);
-	bSound = CCUserDefault::sharedUserDefault()->getBoolForKey("Sound",true);
+    bestScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("BestScore",0);
+    maxTitle = CCUserDefault::sharedUserDefault()->getIntegerForKey("MaxTitle",0);
+    bSound = CCUserDefault::sharedUserDefault()->getBoolForKey("Sound",true);
+
+    curScore = 0;
+    curTitle = 0;
 }
 
-Config * Config::shareConfig()
+Global * Global::shareGlobal()
 {
-	return &s_config;
+    return &s_config;
 }
 
-Config::~Config()
+Global::~Global()
 {
-	CCUserDefault::sharedUserDefault()->setIntegerForKey("BestScore",bestScore);
-	CCUserDefault::sharedUserDefault()->setIntegerForKey("MaxTitle",maxTitle);
-	CCUserDefault::sharedUserDefault()->setBoolForKey("Sound",bSound);
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("BestScore",bestScore);
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("MaxTitle",maxTitle);
+    CCUserDefault::sharedUserDefault()->setBoolForKey("Sound",bSound);
 }
 
 

@@ -5,19 +5,19 @@ USING_NS_CC;
 class LayerOptions :public CCLayerColor
 {
 public:
-	LayerOptions(void);
-	~LayerOptions(void);
+    LayerOptions(void);
+    ~LayerOptions(void);
 
-	virtual bool init();
-	static CCScene* scene(); 
-	CREATE_FUNC(LayerOptions);
+    virtual bool init();
+    static CCScene* scene(); 
+    CREATE_FUNC(LayerOptions);
 
-	void menuContinue(CCObject *pSender);
-	void menuExit(CCObject *pSender);
-	void menuSound(CCObject *pSender);
+    void menuContinue(CCObject *pSender);
+    void menuExit(CCObject *pSender);
+    void menuSound(CCObject *pSender);
 
 protected:
-	virtual void keyBackClicked(void);
+    virtual void keyBackClicked(void);
 
 
 

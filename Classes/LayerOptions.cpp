@@ -13,96 +13,96 @@ LayerOptions::~LayerOptions(void)
 
 void LayerOptions::keyBackClicked( void )
 {
-	CCDirector::sharedDirector()->popScene();
+    CCDirector::sharedDirector()->popScene();
 }
 
 CCScene* LayerOptions::scene()
 {
-	CCScene* scene = CCScene::create();
+    CCScene* scene = CCScene::create();
 
-	LayerOptions* layer = LayerOptions::create();
+    LayerOptions* layer = LayerOptions::create();
 
-	scene->addChild(layer);
+    scene->addChild(layer);
 
-	return scene;
+    return scene;
 
 }
 
 bool LayerOptions::init()
 {
-	bool bRet = false;
-	do 
-	{
-		CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-		CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+    bool bRet = false;
+    do 
+    {
+        CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+        CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
 
-		CC_BREAK_IF(!initWithColor(ccc4(250, 248, 239,255)));
+        CC_BREAK_IF(!initWithColor(ccc4(250, 248, 239,255)));
 
-		CCLabelTTF* label = CCLabelTTF::create("OPTIONS","Arial Bold",32,
-			CCSize(visibleSize.width,visibleSize.height*0.7),kCCTextAlignmentCenter);
+        CCLabelTTF* label = CCLabelTTF::create("OPTIONS","Arial Bold",32,
+            CCSize(visibleSize.width,visibleSize.height*0.7),kCCTextAlignmentCenter);
 
-		CC_BREAK_IF(!label);
+        CC_BREAK_IF(!label);
 
-		label->setColor(ccc3(119,110,101));
-		label->setPosition(ccp(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+        label->setColor(ccc3(119,110,101));
+        label->setPosition(ccp(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 
-		this->addChild(label);
-
-
-		float menuX = visibleSize.width*0.4;
-		float menuY = menuX*0.3;
+        this->addChild(label);
 
 
-		TitleRect *titleContinue = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,"Continue");
-		CCMenuItemLabel *MenuContinue = CCMenuItemLabel::create(titleContinue,this,menu_selector(LayerOptions::menuContinue));
-
-		TitleRect *titleExit = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,"Exit");
-		CCMenuItemLabel *MenuExit = CCMenuItemLabel::create(titleExit,this,menu_selector(LayerOptions::menuExit));
+        float menuX = visibleSize.width*0.4;
+        float menuY = menuX*0.3;
 
 
-		TitleRect *titleSound = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,Config::shareConfig()->bSound?"Sound on":"Sound off");
-		CCMenuItemLabel *MenuSound = CCMenuItemLabel::create(titleSound,this,menu_selector(LayerOptions::menuSound));
+        TitleRect *titleContinue = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,"Continue");
+        CCMenuItemLabel *MenuContinue = CCMenuItemLabel::create(titleContinue,this,menu_selector(LayerOptions::menuContinue));
 
-		CCString *textMax = CCString::createWithFormat("Max:%d",1 << Config::shareConfig()->maxTitle);
+        TitleRect *titleExit = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,"Exit");
+        CCMenuItemLabel *MenuExit = CCMenuItemLabel::create(titleExit,this,menu_selector(LayerOptions::menuExit));
 
-		TitleRect *titleMax = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,textMax->getCString());
-		CCMenuItemLabel *MenuMax = CCMenuItemLabel::create(titleMax,this,menu_selector(LayerOptions::menuContinue));
 
-		MenuMax->setEnabled(false);
+        TitleRect *titleSound = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,Global::shareGlobal()->bSound?"Sound on":"Sound off");
+        CCMenuItemLabel *MenuSound = CCMenuItemLabel::create(titleSound,this,menu_selector(LayerOptions::menuSound));
 
-		CCMenu *menu = CCMenu::create(MenuContinue,MenuExit,MenuSound,MenuMax,NULL);
+        CCString *textMax = CCString::createWithFormat("Max:%d",1 << Global::shareGlobal()->maxTitle);
 
-		menu->alignItemsVerticallyWithPadding(menuY*0.5);
+        TitleRect *titleMax = TitleRect::create(ccc4(187, 173, 160, 255),menuX,menuY,textMax->getCString());
+        CCMenuItemLabel *MenuMax = CCMenuItemLabel::create(titleMax,this,menu_selector(LayerOptions::menuContinue));
 
-		this->addChild(menu);
+        MenuMax->setEnabled(false);
 
-		this->setKeypadEnabled(true);
+        CCMenu *menu = CCMenu::create(MenuContinue,MenuExit,MenuSound,MenuMax,NULL);
 
-		bRet = true;
-	} while (0);
+        menu->alignItemsVerticallyWithPadding(menuY*0.5);
 
-	return bRet;
+        this->addChild(menu);
+
+        this->setKeypadEnabled(true);
+
+        bRet = true;
+    } while (0);
+
+    return bRet;
 }
 
 void LayerOptions::menuContinue( CCObject *pSender )
 {
-	CCDirector::sharedDirector()->popScene();
+    CCDirector::sharedDirector()->popScene();
 }
 
 void LayerOptions::menuExit( CCObject *pSender )
 {
-	CCDirector::sharedDirector()->end();
+    CCDirector::sharedDirector()->end();
 }
 
 void LayerOptions::menuSound( CCObject *pSender )
 {
-	bool &bSound = Config::shareConfig()->bSound;
-	
-	bSound = !bSound;
-	
-	TitleRect *title = (TitleRect*)(((CCMenuItemLabel*)pSender)->getLabel());
+    bool &bSound = Global::shareGlobal()->bSound;
 
-	title->SetTitle(bSound?"Sound on":"Sound off");
-	
+    bSound = !bSound;
+
+    TitleRect *title = (TitleRect*)(((CCMenuItemLabel*)pSender)->getLabel());
+
+    title->SetTitle(bSound?"Sound on":"Sound off");
+
 }

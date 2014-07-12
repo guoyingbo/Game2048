@@ -8,7 +8,9 @@ SOURCES = main.cpp \
         ../Classes/LayerOptions.cpp \
         ../Classes/ModelDialog.cpp \
         ../Classes/NumberCell.cpp \
-	../Classes/Config.cpp
+	../Classes/Config.cpp \
+	../Classes/LayerGameOver.cpp \
+        ../Classes/LayerWin.cpp
 
 COCOS_ROOT = ../../../..
 include $(COCOS_ROOT)/cocos2dx/proj.linux/cocos2dx.mk

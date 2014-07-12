@@ -3,108 +3,108 @@
 
 ModelDialog* ModelDialog::create( const char* title ,CCObject* caller,SEL_CallFunc func,int type )
 {
-	ModelDialog* pRet = new ModelDialog(caller,func);
-	if (pRet && pRet->init(title,type))
-	{
-		pRet->autorelease();
-		return pRet;
-	}
-	else
-	{
-		delete pRet;
-		pRet = NULL;
-		return NULL;
-	}
+    ModelDialog* pRet = new ModelDialog(caller,func);
+    if (pRet && pRet->init(title,type))
+    {
+        pRet->autorelease();
+        return pRet;
+    }
+    else
+    {
+        delete pRet;
+        pRet = NULL;
+        return NULL;
+    }
 }
 
 ModelDialog::ModelDialog( CCObject* caller,SEL_CallFunc func )
-	: m_caller(caller),m_func(func)
+    : m_caller(caller),m_func(func)
 {
 
 }
 
 bool ModelDialog::init( const char* title,int type )
 {
-	bool bRes = false;
+    bool bRes = false;
 
-	do 
-	{
-		CC_BREAK_IF(!CCLayerColor::initWithColor(ccc4(255,255,255,100)));
+    do 
+    {
+        CC_BREAK_IF(!CCLayerColor::initWithColor(ccc4(255,255,255,100)));
 
-		CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-		CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+        CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+        CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
-		float rectX = visibleSize.width*0.8f;
-		float rectY = rectX*0.5f;
-		ColorRect* rect = ColorRect::create(ccc4(187, 173, 160, 255),rectX,rectY);
+        float rectX = visibleSize.width*0.8f;
+        float rectY = rectX*0.5f;
+        ColorRect* rect = ColorRect::create(ccc4(187, 173, 160, 255),rectX,rectY);
 
-		CC_BREAK_IF(!rect);
+        CC_BREAK_IF(!rect);
 
-		rect->setPosition(origin.x +( visibleSize.width-rectX)/2,origin.y+(visibleSize.height-rectY)/2);
+        rect->setPosition(origin.x +( visibleSize.width-rectX)/2,origin.y+(visibleSize.height-rectY)/2);
 
-		this->addChild(rect,1);
-
-
-		CCMenuItemFont* itemYes = CCMenuItemFont::create("Yes",this,menu_selector(ModelDialog::menuYes));
-
-		CCMenuItemFont* itemNo = CCMenuItemFont::create("No",this,menu_selector(ModelDialog::menuNo));
-
-		itemYes->setFontNameObj("Arial Bold");
-		itemYes->setFontSizeObj(rectY*0.15);
-		itemYes->setColor(ccc3(119,110,101));
-
-		itemNo->setFontNameObj("Arial Bold");
-		itemNo->setFontSizeObj(rectY*0.15);
-		itemNo->setColor(ccc3(119,110,101));
-
-		CCMenu *menu = CCMenu::create(itemNo,itemYes,NULL);
-
-		CC_BREAK_IF(!itemYes || !itemNo || !menu);
-
-		menu->setTouchPriority(kCCMenuHandlerPriority*2-1);
-
-		this->addChild(menu,2);
-
-		menu->setPositionY(origin.y+visibleSize.height*0.5 - rectY*0.3);
+        this->addChild(rect,1);
 
 
-		menu->alignItemsHorizontallyWithPadding(rectX*0.4);
+        CCMenuItemFont* itemYes = CCMenuItemFont::create("Yes",this,menu_selector(ModelDialog::menuYes));
+
+        CCMenuItemFont* itemNo = CCMenuItemFont::create("No",this,menu_selector(ModelDialog::menuNo));
+
+        itemYes->setFontNameObj("Arial Bold");
+        itemYes->setFontSizeObj(rectY*0.15);
+        itemYes->setColor(ccc3(119,110,101));
+
+        itemNo->setFontNameObj("Arial Bold");
+        itemNo->setFontSizeObj(rectY*0.15);
+        itemNo->setColor(ccc3(119,110,101));
+
+        CCMenu *menu = CCMenu::create(itemNo,itemYes,NULL);
+
+        CC_BREAK_IF(!itemYes || !itemNo || !menu);
+
+        menu->setTouchPriority(kCCMenuHandlerPriority*2-1);
+
+        this->addChild(menu,2);
+
+        menu->setPositionY(origin.y+visibleSize.height*0.5 - rectY*0.3);
 
 
-		CCLabelTTF *pTitle = CCLabelTTF::create(title,"Arial Bold",rectY*0.2,CCSize(rectX*0.8,rectY*0.7),kCCTextAlignmentCenter);
+        menu->alignItemsHorizontallyWithPadding(rectX*0.4);
 
-		pTitle->setPosition(ccp(origin.x+(visibleSize.width)/2,origin.y+(visibleSize.height)/2));
-	    //pTitle->setColor(ccc3(119,110,101));
 
-		this->addChild(pTitle,2);
-		this->setTouchEnabled(true);
+        CCLabelTTF *pTitle = CCLabelTTF::create(title,"Arial Bold",rectY*0.2,CCSize(rectX*0.8,rectY*0.7),kCCTextAlignmentCenter);
 
-		bRes = true;
-	} while (0);
+        pTitle->setPosition(ccp(origin.x+(visibleSize.width)/2,origin.y+(visibleSize.height)/2));
+        //pTitle->setColor(ccc3(119,110,101));
 
-	return bRes;
+        this->addChild(pTitle,2);
+        this->setTouchEnabled(true);
+
+        bRes = true;
+    } while (0);
+
+    return bRes;
 }
 
 void ModelDialog::registerWithTouchDispatcher()
 {
-	CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this,kCCMenuHandlerPriority*2,true);
+    CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this,kCCMenuHandlerPriority*2,true);
 }
 
 bool ModelDialog::ccTouchBegan( CCTouch* /*pTouch*/, CCEvent* /*pEvent*/ )
 {
-	return true;
+    return true;
 }
 
 void ModelDialog::menuYes( CCObject* /*pSender*/ )
 {
-	this->removeFromParentAndCleanup(true);
+    this->removeFromParentAndCleanup(true);
 
-	(m_caller->*m_func)();
+    (m_caller->*m_func)();
 
 }
 
 void ModelDialog::menuNo( CCObject* /*pSender*/ )
 {
-	this->removeFromParentAndCleanup(true);
+    this->removeFromParentAndCleanup(true);
 }
 
