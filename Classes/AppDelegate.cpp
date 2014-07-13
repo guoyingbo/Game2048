@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <string>
 
 #include "AppMacros.h"
+#include "Config.h"
 #include "LayerBack.h"
 USING_NS_CC;
 using namespace std;
@@ -95,6 +96,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // set FPS. the default value is 1.0/60 if you don't call this
     pDirector->setAnimationInterval(1.0 / 60);
 
+    Global::shareGlobal()->load();
     // create a scene. it's an autorelease object
     CCScene *pScene = CCScene::create();
     CCLayer *pLayer = LayerBack::create();
@@ -104,6 +106,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     // run
     pDirector->runWithScene(pScene);
 
+    Global::shareGlobal()->save();
     return true;
 }
 

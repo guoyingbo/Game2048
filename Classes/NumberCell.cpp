@@ -101,6 +101,9 @@ void ColorRect::draw()
     if (min > dg) min = dg;
     if (min > db) min = db;
 
+    float reSize = cocos2d::CCEGLView::sharedOpenGLView()->getFrameSize().width;
+    glLineWidth(reSize>800?2:1);
+
     int fac = min /2;
 
     ccColor3B cdepth = ccc3(color.r + fac*(dr/min),color.g + fac*(dg/min),color.b + fac*(db/min));

@@ -8,7 +8,7 @@ public:
     ~Global();
     static Global *shareGlobal();
 
-
+    void load();
     void save();
 
     int bestScore;

@@ -35,6 +35,7 @@ LayerBack::LayerBack(): m_best(Global::shareGlobal()->bestScore),
 
 LayerBack::~LayerBack()
 {	
+     Global::shareGlobal()->save();
 }
 
 LayerBack* LayerBack::create()
@@ -52,6 +53,7 @@ LayerBack* LayerBack::create()
         return NULL;
     }
 }
+
 
 
 #define BANK 16
@@ -172,6 +174,8 @@ void LayerBack::menuCloseCallback(CCObject* pSender)
     CCDirector::sharedDirector()->end();
 #endif
 }
+
+
 
 
 
@@ -423,10 +427,10 @@ void LayerBack::ccTouchesEnded(cocos2d::CCSet* pTouches, cocos2d::CCEvent* pEven
                 {
                     int v = max[i*4+j];
                     int la[4];
-                    la[0] = (i-1)*4+j;
-                    la[1] = (i+1)*4+j;
-                    la[2] = i*4+j-1;
-                    la[3] = i*4+j+1;
+                    la[0] = i > 0 ? (i-1)*4+j : -1;
+                    la[1] = i < 3 ? (i+1)*4+j : -1;
+                    la[2] = j > 0 ? i*4+j-1 : -1;
+                    la[3] = j < 3 ? i*4+j+1 : -1;
 
                     for(int k = 0; k < 4; k++)
                         if (la[k] >= 0 && la[k] < 16 && max[la[k]] == v)
